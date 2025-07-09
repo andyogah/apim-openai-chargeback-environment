@@ -1,0 +1,57 @@
+
+{"model":"GPT-4o"}
+{
+  "messages": [
+    {"role": "system", "content": "You are a helpful assistant."},
+    {"role": "user", "content": "What comes after Thursday?"}
+  ],
+  "max_tokens": 20
+}
+
+#text completion
+GPT-3.5-turbo-instruct
+{
+  "messages": [
+    {
+      "role": "system",
+      "content": "You are an expert copywriter skilled at producing high-quality text completions."
+    },
+    {
+      "role": "user",
+      "content": "Write a compelling and concise product description for wireless noise-canceling headphones that emphasizes their features, benefits, and unique selling points."
+    }
+  ],
+  "max_tokens": 256,
+  "temperature": 0.7,
+  "top_p": 0.95,
+  "frequency_penalty": 0,
+  "presence_penalty": 0
+}
+
+#text to image
+DALL-E
+{
+  "prompt": "a painting of a rose with a stem and leaves",
+  "max_tokens": 1
+}
+
+{
+    "prompt": "A detailed illustration of a cozy coffee shop interior with warm lighting, wooden furniture, a brick wall, people enjoying coffee and pastries, a barista preparing a latte at the counter, and a chalkboard menu in the background.",
+    "n": 1,
+    "size": "1024x1024"
+}
+
+text-embedding-3-large
+{
+  "input": "The quick brown fox jumps over the lazy dog."
+}   
+{
+    "input": "Provide a sentence or document to be embedded into vector representation",
+    "model": "text-embedding-ada-002"
+}
+
+
+
+ // "redisCacheName": {
+    //   "value": ""
+    // },    

@@ -1,0 +1,9 @@
+quart
+aioredis
+redis
+azure-identity
+azure-mgmt-redis
+azure-mgmt-core
+azure-mgmt-resource
+hypercorn
+aiohttp  # Added aiohttp to fix the missing dependency
