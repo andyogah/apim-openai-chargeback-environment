@@ -24,15 +24,7 @@
 
 ## 1.1 Overview
 
-Primarily, this development tries to solve the ephemeral and scalability challenges associated with  
-existing API Management (APIM) chargeback implementation for OpenAI services. Amongst other 
-things it will also incrementally address all other non-functional requirements that may 
-arise based of existing and future use cases or needs. This is intended to be a full solution, 
-and not just APIM policies, in that it comes self-contained with supporting Azure resources to 
-to meet aforementioned needs. Consideration was not given to deployment to specific networks and 
-network security groups (NSGs) as those should be specified as part of an overall enterprise 
-architectural landscape. However, this solution can readily plug into any existing enterprise AI architecture
-by just specifying networking and network security parameters in the existing IaC.  
+Primarily, this development tries to solve the ephemeral and scalability challenges associated with existing API Management (APIM) chargeback implementation for OpenAI services. Amongst other so incrementally address all other non-functional requirements that may arise based of existing and future use cases or needs. This is intended to be a full solution, and not just APIM policies, in that it comes self-contained with supporting Azure resources to meet aforementioned needs. Consideration was not given to deployment to specific networks and network security groups (NSGs) as those should be specified as part of an overall enterprise architectural landscape. However, this solution can readily plug into any existing enterprise AI architecture by just specifying networking and network security parameters in the existing IaC.  
 <br /><br />
 
 
@@ -43,6 +35,8 @@ by just specifying networking and network security parameters in the existing Ia
 1. API Management Development Environment
 2. API Management Instance
 3. AI Chatbot 
+
+One can use any open source chatbot for PoC, or build yours from the group up. In our case, we are using LibreChat instance running on a local Docker Desktop 
 
 <br /><br />
 
@@ -76,12 +70,13 @@ These requirements are mostly related to data size and how it is stored. Other c
 ## 2.1 Architecture Design
 
 Resources uses for this implementation are thus:
-1. Azure API Management instance 
-2. Function App 
-3. Azure Cache for Redis 
-3. Key Vault (optional) 
-4. Log Analytics Workspace (optional)
-5. and other related resources.
+1. Azure OpenAI 
+2. Azure API Management instance 
+3. Function App 
+4. Azure Cache for Redis 
+5. Key Vault (optional) 
+6. Log Analytics Workspace (optional)
+7. and other related resources.
 <br /><br />
 
 
