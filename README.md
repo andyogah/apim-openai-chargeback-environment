@@ -51,8 +51,8 @@ by just specifying networking and network security parameters in the existing Ia
 
 1. APIM's Diagnostic Logs has a maximum log capture limit of 8192 bytes for Log analytics Workspaces at 
 a time. Anything larger than that will be truncated. This applies to most other Azure resources. 
-But DOI needs a solution that can handle much larger payloads
-2. DOI also does not want to persist logs and data for security and privacy concerns. And even if there 
+But client needs a solution that can handle much larger payloads
+2. Client also does not want to persist logs and data for security and privacy concerns. And even if there 
 is any of such, there should be flexibility as to how long this should be held for.
 
 These requirements are mostly related to data size and how it is stored. Other concerns are:
