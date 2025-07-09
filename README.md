@@ -24,8 +24,8 @@
 
 ## 1.1 Overview
 
-Primarily, this development tries to solve the ephemeral and scalability challenges of the 
-existing API Management (APIM) chargeback implementation for DOI Generative OpenAI services. Amongst other 
+Primarily, this development tries to solve the ephemeral and scalability challenges associated with  
+existing API Management (APIM) chargeback implementation for OpenAI services. Amongst other 
 things it will also incrementally address all other non-functional requirements that may 
 arise based of existing and future use cases or needs. This is intended to be a full solution, 
 and not just APIM policies, in that it comes self-contained with supporting Azure resources to 
@@ -40,10 +40,9 @@ by just specifying networking and network security parameters in the existing Ia
 
 ## 1.2 Requirements
 
-Related BSS use cases:
-1. WO0000000103023 - DOIChatGPT API Management Development Environment
-2. WO0000000103308 - DOIChatGPT API Management Instance
-3. WO0000000103309 - DOIChatGPT AI Chatbot 
+1. API Management Development Environment
+2. API Management Instance
+3. AI Chatbot 
 
 <br /><br />
 
