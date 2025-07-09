@@ -1,0 +1,57 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    
+    "apimInstanceName": {
+      "value": ""
+    },
+    "apiSpecFileUri": {
+      "value": "https://raw.githubusercontent.com/andyogah/azure-rest-api-specs/main/specification/cognitiveservices/data-plane/AzureOpenAI/inference/stable/2024-02-01/inference.json"
+    },
+    "functionAppName": {
+      "value": ""
+    },
+    "keyVaultName": {
+      "value": "" 
+    },
+    "logAnalyticsWorkspaceName": {
+      "value": ""
+    },
+    "storageAccountName": {
+      "value": ""
+    },
+    "oaiApiName": {
+      "value": ""
+    },
+    "funcApiName": {
+      "value": ""
+    },
+   
+    "backendFunctionAppServiceUrl": {
+      "value": "" 
+    },
+    
+    "workloadName": {
+      "value": ""
+    },
+    "location": {
+      "value": "westus"
+    },
+    "redisCacheName": {
+      "value": ""
+      },
+    "appServicePlanName": {
+      "value": ""
+    },
+    "backendAppName": {
+      "value": ""
+    },
+    "frontendAppName": {
+      "value": ""
+    },    
+    "runtimeStack": {
+      "value": "PYTHON|3.11"
+    }    
+  }
+}

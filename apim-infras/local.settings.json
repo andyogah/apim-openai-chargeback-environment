@@ -1,0 +1,11 @@
+
+{
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "FUNCTIONS_WORKER_RUNTIME": "dotnet",
+    "EventHubConnectionAppSetting": "<Your Event Hub connection string>",
+    "ApplicationInsightsAppId": "<Your Application Insights App ID>",
+    "ApplicationInsightsApiKey": "<Your Application Insights API Key>"
+  }
+}

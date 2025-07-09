@@ -1,0 +1,119 @@
+<!--
+    IMPORTANT:
+    - Policy elements can appear only within the <inbound>, <outbound>, <backend> section elements.
+    - To apply a policy to the incoming request (before it is forwarded to the backend service), place a corresponding policy element within the <inbound> section element.
+    - To apply a policy to the outgoing response (before it is sent back to the caller), place a corresponding policy element within the <outbound> section element.
+    - To add a policy, place the cursor at the desired insertion point and select a policy from the sidebar.
+    - To remove a policy, delete the corresponding policy statement from the policy document.
+    - Position the <base> element within a section element to inherit all policies from the corresponding section element in the enclosing scope.
+    - Remove the <base> element to prevent inheriting policies from the corresponding section element in the enclosing scope.
+    - Policies are applied in the order of their appearance, from the top down.
+    - Comments within policy elements are not supported and may disappear. Place your comments between policy elements or at a higher level scope.
+-->
+<policies>
+	<inbound>
+		<base />
+		<!-- Set variables for later use -->
+		<set-variable name="requestBody" value="@(context.Request.Body.As<string>(preserveContent: true))" />
+		<set-variable name="subscriptionId" value="@(context.Subscription.Id)" />
+		<set-variable name="deploymentId" value="@(context.Request.Url.Path.Split('/').ElementAtOrDefault(3))" />
+		<!-- Set the backend service to the Azure OpenAI endpoint -->
+		<set-backend-service id="apim-generated-policy" backend-id="openAiBackend" />
+		<!-- Use managed identity to authenticate against the Azure Cognitive Services -->
+		<authentication-managed-identity resource="https://cognitiveservices.azure.com/" />
+		<!-- Start of Request Transformation policy -->
+		<!-- Capture the request body as text and add the 'stream_options' property if 'stream' is set to true -->
+		<set-body>@{
+            var rawBody = context.Variables.GetValueOrDefault<string>("requestBody");
+            var requestBody = Newtonsoft.Json.Linq.JObject.Parse(rawBody);
+            if (requestBody["stream"] != null && (bool)requestBody["stream"] == true) {
+                requestBody["stream_options"] = JObject.Parse(@"{""include_usage"":true}");
+            }
+            return requestBody.ToString();
+        }</set-body>
+		<!-- End of Request Transformation policy -->
+	</inbound>
+	<backend>
+		<base />
+	</backend>
+	<outbound>
+		<base />
+		<!-- Capture the raw response as text -->
+		<set-variable name="responseBodyText" value="@{
+            return context.Response.Body.As<string>(preserveContent: true);
+        }" />
+		<!-- Parse the response: if streaming (starts with 'data:'), extract the last chunk with a JSON payload;
+             otherwise parse the entire response text as JSON. -->
+		<set-variable name="parsedResponse" value="@{
+            string txt = (string)context.Variables["responseBodyText"];
+            if (txt.TrimStart().StartsWith("data:")) {
+                var lines = txt.Split(new[] {'\n', '\r'}, StringSplitOptions.RemoveEmptyEntries);
+                // Get the last line starting with 'data:' that contains a JSON part and is not the '[DONE]' marker
+                var chunkLine = lines
+                    .Where(l => l.Trim().StartsWith("data:") && l.Contains("{") && !l.Contains("[DONE]"))
+                    .LastOrDefault();
+                if (chunkLine != null) {
+                    int index = chunkLine.IndexOf('{');
+                    string jsonPart = chunkLine.Substring(index);
+                    return Newtonsoft.Json.Linq.JObject.Parse(jsonPart);
+                }
+                return null;
+            } else {
+                return Newtonsoft.Json.Linq.JObject.Parse(txt);
+            }
+        }" />
+		<!-- Convert parsedResponse to string and store in a new variable -->
+		<set-variable name="parsedResponseString" value="@{
+            var parsedResponse = context.Variables.GetValueOrDefault<Newtonsoft.Json.Linq.JObject>("parsedResponse");
+            return parsedResponse != null ? parsedResponse.ToString() : string.Empty;
+        }" />
+		<!-- Send the request and response bodies to the Azure Function -->
+		<retry condition="@(context.Response.StatusCode == 500)" count="2" interval="2">
+			<send-request mode="new" response-variable-name="azureFunctionResponse" timeout="20" ignore-error="false">
+				<set-url>@{
+                    return $"https://{{FunctionAppName}}.azurewebsites.net/api/log";
+                }</set-url>
+				<set-method>POST</set-method>
+				<set-header name="Content-Type" exists-action="override">
+					<value>application/json</value>
+				</set-header>
+				<set-body>@{
+					var requestBody = context.Variables.GetValueOrDefault<string>("requestBody");
+					var parsedResponseString = context.Variables.GetValueOrDefault<string>("parsedResponseString");
+					var subscriptionId = context.Subscription.Id;
+					var deploymentId = context.Variables.GetValueOrDefault<string>("deploymentId");
+					return $"{{\"subscriptionId\": \"{subscriptionId}\", \"requestBody\": {requestBody}, \"responseBody\": {parsedResponseString}, \"deploymentId\": \"{deploymentId}\"}}";
+				}</set-body>
+				<authentication-managed-identity resource="https://management.azure.com/" />
+			</send-request>
+		</retry>
+	</outbound>
+	<on-error>
+		<base />
+		<!-- Set the error headers -->
+		<set-header name="ErrorSource" exists-action="override">
+			<value>@(context.LastError.Source)</value>
+		</set-header>
+		<set-header name="ErrorReason" exists-action="override">
+			<value>@(context.LastError.Reason)</value>
+		</set-header>
+		<set-header name="ErrorMessage" exists-action="override">
+			<value>@(context.LastError.Message)</value>
+		</set-header>
+		<set-header name="ErrorScope" exists-action="override">
+			<value>@(context.LastError.Scope)</value>
+		</set-header>
+		<set-header name="ErrorSection" exists-action="override">
+			<value>@(context.LastError.Section)</value>
+		</set-header>
+		<set-header name="ErrorPath" exists-action="override">
+			<value>@(context.LastError.Path)</value>
+		</set-header>
+		<set-header name="ErrorPolicyId" exists-action="override">
+			<value>@(context.LastError.PolicyId)</value>
+		</set-header>
+		<set-header name="ErrorStatusCode" exists-action="override">
+			<value>@(context.Response.StatusCode.ToString())</value>
+		</set-header>
+	</on-error>
+</policies>
