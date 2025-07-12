@@ -1,100 +1,219 @@
-## Revisions/Changes To Scope
-<table>
-    <thead>
-      <tr>
-        <th>Version #</th>
-        <th>Date</th>
-        <th>Updated by</th>
-        <th>Reason for update</th>
-        <th>Status</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>1.0</td>
-            <td>03/15/2025</td>
-            <td><code>A. Ogah</code></td>
-            <td><code>Initial version</code></td>
-            <td><code>In progress</code></td>
-        </tr>        
-    </tbody>
-  </table>
-<br /><br />
+# Azure API Management OpenAI Chargeback Environment
 
+A comprehensive solution for implementing scalable OpenAI usage tracking and chargeback mechanisms through Azure API Management, addressing payload size limitations and data persistence concerns.
 
-## 1.1 Overview
+## Table of Contents
+- [Overview](#overview)
+- [Problem Statement](#problem-statement)
+- [Solution Architecture](#solution-architecture)
+- [Getting Started](#getting-started)
+- [Deployment](#deployment)
+- [Usage](#usage)
+- [Configuration](#configuration)
+- [Monitoring](#monitoring)
+- [Contributing](#contributing)
+- [Changelog](#changelog)
 
-Primarily, this development tries to solve the ephemeral and scalability challenges associated with existing API Management (APIM) chargeback implementation for OpenAI services. Amongst other so incrementally address all other non-functional requirements that may arise based of existing and future use cases or needs. This is intended to be a full solution, and not just APIM policies, in that it comes self-contained with supporting Azure resources to meet aforementioned needs. Consideration was not given to deployment to specific networks and network security groups (NSGs) as those should be specified as part of an overall enterprise architectural landscape. However, this solution can readily plug into any existing enterprise AI architecture by just specifying networking and network security parameters in the existing IaC.  
-<br /><br />
+## Overview
 
+### What
+This repository provides a complete Infrastructure-as-Code (IaC) solution for implementing OpenAI usage chargeback in enterprise environments using Azure API Management. The solution addresses scalability challenges and data persistence concerns while providing comprehensive usage tracking and billing capabilities.
 
+### Why
+- **Payload Size Limitations**: Azure APIM Diagnostic Logs have an 8192-byte limit for Log Analytics Workspaces, causing truncation of larger payloads
+- **Data Privacy Concerns**: Organizations need flexible data retention policies and minimal data persistence for security compliance
+- **Cost Management**: Enterprises require detailed usage tracking and chargeback mechanisms for OpenAI services
+- **Scalability**: Need for handling both streaming and batch data processing scenarios
 
+### Who (Audience)
+- **Primary**: Enterprise Azure architects and DevOps engineers
+- **Secondary**: Security teams, Cost management teams, AI/ML platform teams
+- **Tertiary**: Compliance officers and data governance teams
 
-## 1.2 Requirements
+### When
+- **Initial Release**: March 15, 2025
+- **Target Deployment**: Production-ready for enterprise environments
+- **Maintenance**: Ongoing updates based on Azure service evolution
 
-1. API Management Development Environment
-2. API Management Instance
-3. AI Chatbot 
+### Where
+- **Cloud Platform**: Microsoft Azure
+- **Deployment Regions**: Multi-region capable
+- **Network Integration**: Enterprise network-ready with NSG compatibility
 
-One can use any open source chatbot for PoC, or build yours from the group up. In our case, we are using LibreChat instance running on a local Docker Desktop 
+## Problem Statement
 
-<br /><br />
+### Current Challenges
+1. **Log Size Limitations**: APIM Diagnostic Logs truncate at 8192 bytes, insufficient for large OpenAI payloads
+2. **Data Persistence**: Security requirements demand minimal data retention with flexible policies
+3. **Scalability**: Need to handle varying data volumes and formats
+4. **Cost Tracking**: Lack of granular usage tracking and chargeback mechanisms
 
+### Technical Requirements
+- Handle streaming and batch data processing
+- Support various natural language data formats
+- Provide data veracity and validation
+- Deliver actionable chargeback insights
+- Maintain low operational costs
+- Ensure high maintainability and reproducibility
+- Enable automated workflows
 
-## 1.3  Problem Statement
+## Solution Architecture
 
-1. APIM's Diagnostic Logs has a maximum log capture limit of 8192 bytes for Log analytics Workspaces at 
-a time. Anything larger than that will be truncated. This applies to most other Azure resources. 
-But client needs a solution that can handle much larger payloads
-2. Client also does not want to persist logs and data for security and privacy concerns. And even if there 
-is any of such, there should be flexibility as to how long this should be held for.
+### Core Components
+```
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   AI Chatbot    │───▶│   API Gateway   │───▶│   Azure OpenAI  │
+│   (LibreChat)   │    │   (APIM)        │    │   Service       │
+└─────────────────┘    └─────────────────┘    └─────────────────┘
+                                │
+                                ▼
+                       ┌─────────────────┐
+                       │  Function App   │
+                       │  (Processing)   │
+                       └─────────────────┘
+                                │
+                                ▼
+                       ┌─────────────────┐
+                       │  Redis Cache    │
+                       │  (Temp Storage) │
+                       └─────────────────┘
+```
 
-These requirements are mostly related to data size and how it is stored. Other concerns are:
- - The solution should be able to handle streaming and batch data
- - The solution should be able to handle variety of natural language data input or format
- - The solution should have some form of data veracity baked in
- - The solution should be able be to provide some data chargeback insight value
+### Azure Resources
+- **Azure OpenAI**: Core AI service endpoint
+- **Azure API Management**: Gateway and policy enforcement
+- **Azure Functions**: Serverless processing and chargeback logic
+- **Azure Cache for Redis**: Temporary data storage and session management
+- **Azure Key Vault**: Secure credential management (optional)
+- **Log Analytics Workspace**: Monitoring and diagnostics (optional)
 
- All other concerns are related to non-function requirements as follows:
- 1. Cost - little or no expense
- 2. Highly maintainable
- 3. Highly reproducible
- 4. Automated workflow and processes
-<br /><br />
+## Getting Started
 
-## 1.4 Existing Implementation and Current System
+### Prerequisites
+- Azure subscription with appropriate permissions
+- Azure CLI or PowerShell
+- Docker Desktop (for local LibreChat instance)
+- Terraform or ARM templates (for IaC deployment)
 
-## 1.5 Pre-analysis Notes
-<br /><br />
+### Quick Start
+1. Clone the repository
+2. Configure environment variables
+3. Deploy infrastructure using provided IaC templates
+4. Configure APIM policies
+5. Set up monitoring and alerting
 
-## 2.1 Architecture Design
+## Deployment
 
-Resources uses for this implementation are thus:
-1. Azure OpenAI 
-2. Azure API Management instance 
-3. Function App 
-4. Azure Cache for Redis 
-5. Key Vault (optional) 
-6. Log Analytics Workspace (optional)
-7. and other related resources.
-<br /><br />
+### Infrastructure Deployment
+```bash
+# Navigate to infrastructure directory
+cd infrastructure/
 
+# Initialize Terraform
+terraform init
 
-## 2.2 Development Approach
+# Plan deployment
+terraform plan -var-file="environments/dev.tfvars"
 
-## 2.3 Unit Testing
-example of what the chargeback table will look like 
+# Apply configuration
+terraform apply -var-file="environments/dev.tfvars"
+```
+
+### APIM Policy Configuration
+The solution includes custom APIM policies for:
+- Request/response logging
+- Usage tracking
+- Rate limiting
+- Authentication/authorization
+- Payload size management
+
+### Function App Deployment
+Automated deployment through Azure DevOps pipelines or GitHub Actions.
+
+## Usage
+
+### Chargeback Data Example
+The solution provides detailed usage tracking as shown below:
 
 ![Example of chargeback table](app/backend/example-log-chargeback.png)
-## 2.4 Navigation
 
-## 2.5 Technical Details
+### API Endpoints
+- `POST /api/v1/openai/chat/completions` - OpenAI chat completions
+- `GET /api/v1/usage/summary` - Usage summary
+- `GET /api/v1/chargeback/report` - Chargeback report
 
-## Deployment Notes
+### Monitoring Dashboard
+Access real-time usage metrics through Azure Monitor workbooks and custom dashboards.
 
+## Configuration
 
+### Environment Variables
+```bash
+AZURE_OPENAI_ENDPOINT=https://your-openai-instance.openai.azure.com/
+AZURE_OPENAI_API_KEY=your-api-key
+REDIS_CONNECTION_STRING=your-redis-connection-string
+APIM_SUBSCRIPTION_KEY=your-apim-subscription-key
+```
 
-TO BE CONTINUED.
+### APIM Policies
+Configuration files located in `/policies/` directory:
+- `inbound-policy.xml` - Request processing
+- `outbound-policy.xml` - Response processing
+- `on-error-policy.xml` - Error handling
+
+## Monitoring
+
+### Key Metrics
+- API request volume and latency
+- OpenAI token usage and costs
+- Error rates and failure patterns
+- Cache hit/miss ratios
+- Function execution metrics
+
+### Alerting
+Configured alerts for:
+- High API usage
+- Error rate thresholds
+- Cost anomalies
+- Performance degradation
+
+## Contributing
+
+### Development Workflow
+1. Fork the repository
+2. Create feature branch
+3. Implement changes with tests
+4. Submit pull request
+5. Code review and approval
+
+### Testing
+- Unit tests for Function App logic
+- Integration tests for APIM policies
+- End-to-end testing with LibreChat
+
+## Changelog
+
+### Version History
+| Version | Date | Author | Changes | Status |
+|---------|------|--------|---------|--------|
+| 1.0 | 03/15/2025 | A. Ogah | Initial version | In Progress |
+| 1.1 | TBD | TBD | Enhanced monitoring | Planned |
+| 2.0 | TBD | TBD | Multi-region support | Planned |
+
+## Support
+
+For questions, issues, or contributions:
+- Create an issue in this repository
+- Contact the development team
+- Review documentation in `/docs/` directory
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+---
+
+**Note**: This solution is designed to integrate seamlessly with existing enterprise AI architectures. Network security groups (NSGs) and enterprise networking parameters should be configured based on your organization's security requirements.
 
 
 
