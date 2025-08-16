@@ -110,7 +110,7 @@ response = requests.post(
 
 ## Chargeback Dashboard Preview
 
-![Chargeback Example](app/backend/example-log-chargeback.png)
+![Chargeback Example](app/example-log-chargeback2.png)
 
 *Real-time usage tracking with detailed cost breakdown by user, model, and time period.*
 
