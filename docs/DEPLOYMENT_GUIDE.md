@@ -212,18 +212,34 @@ az functionapp deployment source config-zip \
 ```
 
 ### 4. APIM Policy Configuration
-```bash
-# Deploy APIM policies
-cd ../policies
-./deploy-policies.sh
 
-# Or manually deploy policies
-az apim api policy create \
-  --resource-group <resource-group> \
-  --service-name <apim-service> \
-  --api-id <api-id> \
-  --policy-file inbound-policy.xml
-```
+**What the Bicep deploy does automatically:** `apim-infras/apimOaiApi.bicep` creates the OpenAI
+API with a **minimal** policy (backend routing to Azure OpenAI + managed-identity auth) and
+provisions the `FunctionAppName` named value the metering policy references.
+
+**What is manual:** the full chargeback metering policy — `policies/example-policy.xml`, which
+injects `stream_options.include_usage`, captures usage, and `send-request`s it to the Function
+App's `/api/log` endpoint — is **not** applied by the deploy (the `loadTextContent` line in
+`apimOaiApi.bicep` is commented out). Apply it after deployment:
+
+- **Portal (simplest):** APIM → APIs → the OpenAI API → All operations → inbound policy
+  `</>` code editor → paste the contents of `policies/example-policy.xml` → Save.
+- **CLI:** push the file with `az rest`:
+
+  ```bash
+  az rest --method PUT \
+    --url "https://management.azure.com/subscriptions/<sub>/resourceGroups/<rg>/providers/Microsoft.ApiManagement/service/<apim-service>/apis/<api-id>/policies/policy?api-version=2022-08-01" \
+    --body "{\"properties\":{\"format\":\"rawxml\",\"value\":$(python -c "import json;print(json.dumps(open('policies/example-policy.xml').read()))")}}"
+  ```
+
+- **Or make it automatic:** uncomment the `loadTextContent('../policies/example-policy.xml')`
+  line in `apim-infras/apimOaiApi.bicep` (and remove the inline `value`) so every deploy applies
+  the full policy.
+
+> ⚠️ **Re-deploys revert the policy.** The Bicep manages the API policy resource with the minimal
+> inline XML, so re-running the infra deploy overwrites a manually applied metering policy —
+> re-apply it after each infra run (or use the `loadTextContent` option above). Keep
+> `policies/example-policy.xml` in git as the source of truth; don't let the portal copy drift.
 
 ### 5. Post-Deployment Configuration
 ```bash
