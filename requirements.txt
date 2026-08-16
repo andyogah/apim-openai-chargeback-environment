@@ -1,0 +1,18 @@
+# Generated 2026-08-15 from a scan of imports across the real code
+# (ai-service, app/backend, app/frontend, src) and app/backend/requirements.txt.
+# Excludes the vendored app/venv, src/.venv, and src/.python_packages trees.
+aiohttp
+azure-functions
+azure-identity
+azure-mgmt-core
+azure-mgmt-redis
+azure-mgmt-resource
+azure-search-documents
+hypercorn
+openai
+pandas
+python-dotenv
+quart
+redis
+requests
+streamlit
