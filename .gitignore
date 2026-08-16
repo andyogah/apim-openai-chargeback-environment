@@ -58,3 +58,7 @@ Thumbs.db
 
 # Deployment outputs
 infraOutputs.json
+
+# Azure Functions build artifacts
+.python_packages/
+
