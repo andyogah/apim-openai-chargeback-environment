@@ -21,9 +21,9 @@ Enterprise-ready solution for OpenAI usage tracking and chargeback through Azure
 git clone https://github.com/your-org/apim-openai-chargeback-environment.git
 cd apim-openai-chargeback-environment
 
-# 2. Setup Python environment
-cd function-app && python -m venv venv && source venv/bin/activate
-pip install -r requirements.txt
+# 2. Setup Python environment (one-time per machine; venv at %LOCALAPPDATA%\repo-venvs\apim-openai-chargeback-environment)
+..\setup-venv.ps1
+& "$env:LOCALAPPDATA\repo-venvs\apim-openai-chargeback-environment\Scripts\Activate.ps1"
 
 # 3. Deploy infrastructure (Bicep - recommended)
 cd ../infrastructure/bicep
