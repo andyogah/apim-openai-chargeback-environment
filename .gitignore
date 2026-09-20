@@ -62,3 +62,6 @@ infraOutputs.json
 # Azure Functions build artifacts
 .python_packages/
 
+
+# Windows "downloaded from the internet" markers, materialised as files by a drive recovery
+*Zone.Identifier
