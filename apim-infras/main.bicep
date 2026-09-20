@@ -161,7 +161,7 @@ module aiServices '../ais-infras/aiService.bicep' = {
         raiPolicyName: 'Microsoft.Default'
         versionUpgradeOption: 'OnceCurrentVersionExpired'
         sku: {
-          name: 'GlobalStandard'
+          name: 'DataZoneStandard'
           capacity: 10
         }        
       }
@@ -175,7 +175,7 @@ module aiServices '../ais-infras/aiService.bicep' = {
         raiPolicyName: 'Microsoft.Default'
         versionUpgradeOption: 'OnceCurrentVersionExpired'
         sku: {
-          name: 'GlobalStandard'
+          name: 'DataZoneStandard'
           capacity: 5
         }
       }      
@@ -189,7 +189,7 @@ module aiServices '../ais-infras/aiService.bicep' = {
         raiPolicyName: 'Microsoft.Default'
         versionUpgradeOption: 'OnceCurrentVersionExpired'
         sku: {
-          name: 'GlobalStandard'
+          name: 'DataZoneStandard'
           capacity: 5
         }
       }      
